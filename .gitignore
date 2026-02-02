@@ -1,3 +1,7 @@
+# My excludes
+build/*
+bin/*
+
 # Prerequisites
 *.d
 
