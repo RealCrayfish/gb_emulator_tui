@@ -1,42 +1,34 @@
-#include "emulator.h"
 #include <stdio.h>
+#include <stdlib.h>
 
+unsigned int loadRom(const char *rompath, unsigned char *buffer) {
+    FILE *romfile;
+    unsigned int filelen;
 
-unsigned int loadRom(const char *rompath, unsigned char instructions[]) {
-    unsigned int bytesread = 0;
-    unsigned int filesize = 0;
-    
-    FILE *romfile = fopen(rompath, "rb");
-    
-    if (!romfile) {
-        fprintf(stderr, "Failed to load ROM.\n");
-        return 0;
-    }
-    
+    romfile = fopen(rompath, "rb");
+    if (!romfile) { return -1; }
+
     fseek(romfile, 0, SEEK_END);
-    filesize = ftell(romfile);
+    filelen = ftell(romfile);
     rewind(romfile);
-    
-    bytesread = fread(instructions, 1, filesize, romfile);
-    
-    if (bytesread != filesize) {
-        fprintf(stderr, "Bytes read does not match the file size.\n");
-        return 0;
-    }
-    
+    fread(buffer, filelen, 1, romfile);
     fclose(romfile);
-    
-    return bytesread;
+
+    return filelen;
 }
 
 // Arguments:
 //  argv[1] - path to rom file
 int main(/* int argc, char** argv */) {
-    unsigned char instructions[8192];
+    unsigned char *instructions = malloc(0x2000000);
 
     printf("Loading ROM.\n");
     unsigned int programsize = loadRom("test/testrom.gb", instructions);
-    if (programsize <= 0) { fprintf(stderr, "Failed to load ROM.\n"); return 1;}
+    if (programsize <= 1) { fprintf(stderr, "Failed to load ROM.\n"); return 1;}
+
+    for (unsigned int i = 0; i < 650000; i++) {
+        printf("%x", instructions[i]);
+    }
 
     return 0;
 }
